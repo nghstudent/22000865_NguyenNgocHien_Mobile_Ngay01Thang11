@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { SafeAreaView, FlatList, Text, View, StyleSheet, TextInput, TouchableOpacity } from "react-native";
+import {
+  SafeAreaView,
+  FlatList,
+  Text,
+  View,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  RefreshControl,
+} from "react-native";
 import { getDeletedExpenses, deleteExpense } from "../database/db";
 import { Expense } from "../types/Expense";
 import ExpenseItem from "../components/ExpenseItem";
@@ -7,6 +16,7 @@ import ExpenseItem from "../components/ExpenseItem";
 export default function TrashScreen({ navigation }: any) {
   const [deletedExpenses, setDeletedExpenses] = useState<Expense[]>([]);
   const [searchText, setSearchText] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
 
   const loadDeleted = () => {
     const data = getDeletedExpenses() as Expense[];
@@ -22,6 +32,12 @@ export default function TrashScreen({ navigation }: any) {
   const handleDelete = (item: Expense) => {
     deleteExpense(item.id);
     loadDeleted();
+  };
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    loadDeleted();
+    setRefreshing(false);
   };
 
   const filteredDeleted = deletedExpenses.filter(e =>
@@ -52,6 +68,9 @@ export default function TrashScreen({ navigation }: any) {
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>Thùng rác trống</Text>
           </View>
+        }
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       />
 
@@ -93,4 +112,3 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
 });
-

@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { SafeAreaView, FlatList, TouchableOpacity, Text, View, StyleSheet, TextInput } from "react-native";
+import {
+  SafeAreaView,
+  FlatList,
+  TouchableOpacity,
+  Text,
+  View,
+  StyleSheet,
+  TextInput,
+  RefreshControl,
+} from "react-native";
 import ExpenseItem from "../components/ExpenseItem";
 import { Expense } from "../types/Expense";
 import { getAllExpenses, softDeleteExpense } from "../database/db";
@@ -7,6 +16,7 @@ import { getAllExpenses, softDeleteExpense } from "../database/db";
 export default function HomeScreen({ navigation }: any) {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [searchText, setSearchText] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
 
   const loadExpenses = () => {
     const data = getAllExpenses() as Expense[];
@@ -22,6 +32,12 @@ export default function HomeScreen({ navigation }: any) {
   const handleSoftDelete = (item: Expense) => {
     softDeleteExpense(item.id);
     loadExpenses();
+  };
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    loadExpenses();
+    setRefreshing(false);
   };
 
   const filteredExpenses = expenses.filter(e =>
@@ -48,6 +64,9 @@ export default function HomeScreen({ navigation }: any) {
           />
         )}
         contentContainerStyle={styles.listContainer}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       />
 
       <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate("AddExpense")}>
