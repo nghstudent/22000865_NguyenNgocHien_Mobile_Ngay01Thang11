@@ -16,6 +16,7 @@ import { getAllExpenses, softDeleteExpense } from "../database/db";
 export default function HomeScreen({ navigation }: any) {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [searchText, setSearchText] = useState("");
+  const [filterType, setFilterType] = useState<"Tất cả" | "Thu" | "Chi">("Tất cả");
   const [refreshing, setRefreshing] = useState(false);
 
   const loadExpenses = () => {
@@ -40,12 +41,17 @@ export default function HomeScreen({ navigation }: any) {
     setRefreshing(false);
   };
 
-  const filteredExpenses = expenses.filter(e =>
-    e.title.toLowerCase().includes(searchText.toLowerCase())
-  );
+  const filteredExpenses = expenses
+    .filter(e =>
+      filterType === "Tất cả" ? true : e.type === filterType
+    )
+    .filter(e =>
+      e.title.toLowerCase().includes(searchText.toLowerCase())
+    );
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Search input */}
       <TextInput
         placeholder="Tìm kiếm..."
         value={searchText}
@@ -53,6 +59,30 @@ export default function HomeScreen({ navigation }: any) {
         style={styles.searchInput}
       />
 
+      {/* Filter buttons */}
+      <View style={styles.filterContainer}>
+        {["Tất cả", "Thu", "Chi"].map((type) => (
+          <TouchableOpacity
+            key={type}
+            style={[
+              styles.filterButton,
+              filterType === type && styles.filterButtonActive,
+            ]}
+            onPress={() => setFilterType(type as any)}
+          >
+            <Text
+              style={[
+                styles.filterText,
+                filterType === type && styles.filterTextActive,
+              ]}
+            >
+              {type}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      {/* Expense list */}
       <FlatList
         data={filteredExpenses}
         keyExtractor={(item) => item.id.toString()}
@@ -124,4 +154,23 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     backgroundColor: "#fff",
   },
+  filterContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginHorizontal: 10,
+    marginBottom: 10,
+  },
+  filterButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#6200EE",
+    backgroundColor: "#fff",
+  },
+  filterButtonActive: {
+    backgroundColor: "#6200EE",
+  },
+  filterText: { color: "#6200EE", fontWeight: "600" },
+  filterTextActive: { color: "#fff" },
 });
