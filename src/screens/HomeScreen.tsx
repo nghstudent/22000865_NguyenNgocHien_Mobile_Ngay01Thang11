@@ -1,3 +1,4 @@
+// src/screens/HomeScreen.tsx
 import React, { useEffect, useState } from "react";
 import {
   SafeAreaView,
@@ -6,11 +7,12 @@ import {
   TouchableOpacity,
   Text,
   View,
+  Alert,
 } from "react-native";
 import Header from "../components/Header";
 import ExpenseItem from "../components/ExpenseItem";
 import { Expense } from "../types/Expense";
-import { getAllExpenses } from "../database/db";
+import { getAllExpenses, deleteExpense } from "../database/db";
 
 export default function HomeScreen({ navigation }: any) {
   const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -26,6 +28,24 @@ export default function HomeScreen({ navigation }: any) {
     return unsubscribe;
   }, [navigation]);
 
+  const handleLongPress = (expense: Expense) => {
+    Alert.alert(
+      "Xóa khoản thu/chi",
+      "Bạn có chắc chắn muốn xóa khoản này?",
+      [
+        { text: "Hủy", style: "cancel" },
+        {
+          text: "Xóa",
+          style: "destructive",
+          onPress: () => {
+            const success = deleteExpense(expense.id);
+            if (success) loadExpenses();
+          },
+        },
+      ]
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <Header />
@@ -37,7 +57,7 @@ export default function HomeScreen({ navigation }: any) {
           <ExpenseItem
             item={item}
             onPress={() => navigation.navigate("EditExpense", { expense: item })}
-            onLongPress={() => console.log("Nhấn giữ:", item.id)}
+            onLongPress={() => handleLongPress(item)}
           />
         )}
         contentContainerStyle={styles.listContainer}
@@ -59,6 +79,22 @@ export default function HomeScreen({ navigation }: any) {
       >
         <Text style={styles.addButtonText}>+</Text>
       </TouchableOpacity>
+
+      {/* Bottom Navigation */}
+      <View style={styles.bottomNav}>
+        <TouchableOpacity
+          style={[styles.navItem, styles.navItemActive]}
+          onPress={() => {}}
+        >
+          <Text style={[styles.navText, styles.navTextActive]}>Home</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => navigation.navigate("Trash")}
+        >
+          <Text style={styles.navText}>Thùng rác</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
@@ -77,7 +113,7 @@ const styles = StyleSheet.create({
   addButton: {
     position: "absolute",
     right: 20,
-    bottom: 30,
+    bottom: 70,
     backgroundColor: "#6200EE",
     width: 60,
     height: 60,
@@ -95,5 +131,29 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "300",
     marginTop: -2,
+  },
+  bottomNav: {
+    flexDirection: "row",
+    backgroundColor: "#fff",
+    borderTopWidth: 1,
+    borderTopColor: "#E0E0E0",
+    paddingVertical: 8,
+  },
+  navItem: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  navItemActive: {
+    borderTopWidth: 2,
+    borderTopColor: "#6200EE",
+  },
+  navText: {
+    fontSize: 14,
+    color: "#999",
+  },
+  navTextActive: {
+    color: "#6200EE",
+    fontWeight: "600",
   },
 });

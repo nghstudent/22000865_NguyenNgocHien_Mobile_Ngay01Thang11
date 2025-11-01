@@ -62,4 +62,27 @@ export const updateExpense = (id: number, title: string, amount: number, type: "
   }
 };
 
+// Xóa mềm (mark as deleted)
+export const deleteExpense = (id: number) => {
+  try {
+    db.runSync('UPDATE expenses SET deleted = 1 WHERE id = ?', [id]);
+    console.log('✅ Expense deleted:', id);
+    return true;
+  } catch (error) {
+    console.error('❌ Error deleting expense:', error);
+    return false;
+  }
+};
+
+// Lấy các khoản đã xóa
+export const getDeletedExpenses = () => {
+  try {
+    return db.getAllSync('SELECT * FROM expenses WHERE deleted = 1 ORDER BY id DESC');
+  } catch (error) {
+    console.error('❌ Error fetching deleted expenses:', error);
+    return [];
+  }
+};
+
+
 export default db;
