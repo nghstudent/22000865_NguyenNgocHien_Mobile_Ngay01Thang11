@@ -91,4 +91,20 @@ export const deleteExpense = (id: number) => {
   }
 };
 
+// Khôi phục khoản thu/chi đã xóa
+export const restoreExpense = (id: number) => {
+  try {
+    db.runSync(
+      'UPDATE expenses SET deleted = 0 WHERE id = ?',
+      [id]
+    );
+    console.log("✅ Expense restored:", id);
+    return true;
+  } catch (error) {
+    console.error("❌ Error restoring expense:", error);
+    return false;
+  }
+};
+
+
 export default db;

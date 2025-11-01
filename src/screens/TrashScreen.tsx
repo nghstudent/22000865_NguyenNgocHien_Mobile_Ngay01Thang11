@@ -8,8 +8,9 @@ import {
   TextInput,
   TouchableOpacity,
   RefreshControl,
+  Alert,
 } from "react-native";
-import { getDeletedExpenses, deleteExpense } from "../database/db";
+import { getDeletedExpenses, deleteExpense, restoreExpense } from "../database/db";
 import { Expense } from "../types/Expense";
 import ExpenseItem from "../components/ExpenseItem";
 
@@ -29,9 +30,31 @@ export default function TrashScreen({ navigation }: any) {
     return unsubscribe;
   }, [navigation]);
 
-  const handleDelete = (item: Expense) => {
-    deleteExpense(item.id);
-    loadDeleted();
+  // Xử lý nhấn lâu: hiển thị 2 lựa chọn
+  const handleLongPress = (item: Expense) => {
+    Alert.alert(
+      "Chọn hành động",
+      `Bạn muốn làm gì với "${item.title}"?`,
+      [
+        {
+          text: "Khôi phục",
+          onPress: () => {
+            restoreExpense(item.id);
+            loadDeleted();
+          },
+        },
+        {
+          text: "Xóa luôn",
+          style: "destructive",
+          onPress: () => {
+            deleteExpense(item.id);
+            loadDeleted();
+          },
+        },
+        { text: "Hủy", style: "cancel" },
+      ],
+      { cancelable: true }
+    );
   };
 
   const onRefresh = () => {
@@ -60,7 +83,7 @@ export default function TrashScreen({ navigation }: any) {
           <ExpenseItem
             item={item}
             onPress={() => {}}
-            onLongPress={() => handleDelete(item)}
+            onLongPress={() => handleLongPress(item)}
           />
         )}
         contentContainerStyle={styles.listContainer}
