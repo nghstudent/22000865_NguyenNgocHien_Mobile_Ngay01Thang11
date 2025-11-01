@@ -1,4 +1,3 @@
-// src/database/db.ts
 import * as SQLite from 'expo-sqlite';
 
 const db = SQLite.openDatabaseSync('expenses.db');
@@ -16,9 +15,9 @@ export const initDatabase = () => {
         deleted INTEGER DEFAULT 0
       );
     `);
-    console.log('✅ Database initialized');
+    console.log('Database initialized');
   } catch (error) {
-    console.error('❌ Error initializing database:', error);
+    console.error('Error initializing database:', error);
   }
 };
 
@@ -30,21 +29,36 @@ export const addExpense = (title: string, amount: number, type: "Thu" | "Chi") =
       'INSERT INTO expenses (title, amount, type, createdAt, deleted) VALUES (?, ?, ?, ?, 0)',
       [title, amount, type, createdAt]
     );
-    console.log('✅ Expense added with ID:', result.lastInsertRowId);
+    console.log('Expense added with ID:', result.lastInsertRowId);
     return result.lastInsertRowId;
   } catch (error) {
-    console.error('❌ Error adding expense:', error);
+    console.error('Error adding expense:', error);
     return null;
   }
 };
 
-// Lấy danh sách khoản thu/chi chưa xóa (sẽ dùng cho màn hình chính)
+// Lấy danh sách khoản thu/chi chưa xóa
 export const getAllExpenses = () => {
   try {
     return db.getAllSync('SELECT * FROM expenses WHERE deleted = 0 ORDER BY id DESC');
   } catch (error) {
-    console.error('❌ Error fetching expenses:', error);
+    console.error('Error fetching expenses:', error);
     return [];
+  }
+};
+
+// Cập nhật khoản thu/chi
+export const updateExpense = (id: number, title: string, amount: number, type: "Thu" | "Chi") => {
+  try {
+    db.runSync(
+      'UPDATE expenses SET title = ?, amount = ?, type = ? WHERE id = ?',
+      [title, amount, type, id]
+    );
+    console.log("Expense updated:", id);
+    return true;
+  } catch (error) {
+    console.error("Error updating expense:", error);
+    return false;
   }
 };
 

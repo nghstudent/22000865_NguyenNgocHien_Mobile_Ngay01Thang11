@@ -1,45 +1,3 @@
-// // src/screens/HomeScreen.tsx
-// import React, { useEffect, useState } from "react";
-// import { SafeAreaView, FlatList, StyleSheet, Button } from "react-native";
-// import Header from "../components/Header";
-// import ExpenseItem from "../components/ExpenseItem";
-// import { Expense } from "../types/Expense";
-// import { getAllExpenses } from "../database/db";
-
-// export default function HomeScreen({ navigation }: any) {
-//   const [expenses, setExpenses] = useState<Expense[]>([]);
-
-//   const loadExpenses = () => {
-//     // Ép kiểu từ unknown[] -> Expense[]
-//     const data = getAllExpenses() as Expense[];
-//     setExpenses(data);
-//   };
-
-//   useEffect(() => {
-//     loadExpenses();
-//     const unsubscribe = navigation.addListener('focus', loadExpenses); // refresh khi quay lại AddExpenseScreen
-//     return unsubscribe;
-//   }, [navigation]);
-
-//   return (
-//     <SafeAreaView style={styles.container}>
-//       <Header />
-//       <Button title="Add" onPress={() => navigation.navigate("AddExpense")} />
-//       <FlatList
-//         data={expenses}
-//         keyExtractor={(item) => item.id.toString()}
-//         renderItem={({ item }) => <ExpenseItem item={item} />}
-//         contentContainerStyle={{ paddingVertical: 10 }}
-//       />
-//     </SafeAreaView>
-//   );
-// }
-
-// const styles = StyleSheet.create({
-//   container: { flex: 1, backgroundColor: "#f2f2f2" },
-// });
-
-
 import React, { useEffect, useState } from "react";
 import {
   SafeAreaView,
@@ -78,7 +36,7 @@ export default function HomeScreen({ navigation }: any) {
         renderItem={({ item }) => (
           <ExpenseItem
             item={item}
-            onPress={() => console.log("Nhấn vào:", item.id)}
+            onPress={() => navigation.navigate("EditExpense", { expense: item })}
             onLongPress={() => console.log("Nhấn giữ:", item.id)}
           />
         )}
