@@ -1,24 +1,32 @@
 // src/components/ExpenseItem.tsx
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Expense } from "../types/Expense";
 
 interface Props {
   item: Expense;
+  onPress?: () => void;       // thêm
+  onLongPress?: () => void;   // thêm
 }
 
-export default function ExpenseItem({ item }: Props) {
+export default function ExpenseItem({ item, onPress, onLongPress }: Props) {
   return (
-    <View style={[styles.container, item.type === "Thu" ? styles.income : styles.expense]}>
-      <View style={styles.row}>
-        <Text style={styles.title}>{item.title}</Text>
-        <Text style={styles.amount}>{item.amount.toLocaleString()}₫</Text>
+    <TouchableOpacity
+      onPress={onPress}
+      onLongPress={onLongPress}
+      activeOpacity={0.7}
+    >
+      <View style={[styles.container, item.type === "Thu" ? styles.income : styles.expense]}>
+        <View style={styles.row}>
+          <Text style={styles.title}>{item.title}</Text>
+          <Text style={styles.amount}>{item.amount.toLocaleString()}₫</Text>
+        </View>
+        <View style={styles.row}>
+          <Text style={styles.date}>{new Date(item.createdAt).toLocaleDateString()}</Text>
+          <Text style={styles.type}>{item.type}</Text>
+        </View>
       </View>
-      <View style={styles.row}>
-        <Text style={styles.date}>{new Date(item.createdAt).toLocaleDateString()}</Text>
-        <Text style={styles.type}>{item.type}</Text>
-      </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
